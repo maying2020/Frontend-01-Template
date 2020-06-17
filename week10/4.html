@@ -1,0 +1,198 @@
+
+<style>
+#board{
+    width:350px;
+}
+.cell{
+    width:100px;
+    height:100px;
+    border:1px solid white;
+    display:inline-block;
+    background:green;
+    vertical-align:middle;
+    line-height:100px;
+    font-size:50px;
+    text-align:center;
+    
+}
+</style>
+
+
+<div id="board"></div>
+
+<script>
+let pattern = [
+    [2,0,0],
+    [0,1,0],
+    [0,0,0]
+]
+
+let color=1;
+//展示
+function show(){
+    let board = document.getElementById("board");
+    board.innerHTML = "";
+    for(let i = 0; i < 3; i ++){
+        for(let j = 0;j < 3;j++){
+            let cell = document.createElement("div");
+            cell.classList.add('cell');
+            cell.innerText = 
+                pattern[i][j] == 2 ? '❌':
+                pattern[i][j] == 1 ? '⭕️':
+                ""
+            cell.addEventListener('click',()=>move(j,i))   //j x轴
+            board.appendChild(cell);
+        }
+    }
+}
+
+//落子
+function move(x,y){
+    if(pattern[y][x] !==0){
+        return;
+    }
+    pattern[y][x] = color;
+    if(check(pattern,color)){
+        alert(color == 2 ? '❌ is win': '⭕️ is win' )
+    }
+    color = 3-color;
+    show();
+    //颜色变换之后才传递的
+    if(willWin(pattern,color)){
+    console.log(color == 2 ? '❌ will win': '⭕️ will win' )
+}
+}
+
+function Computedmove(){
+
+}
+
+//board.appendChild(document.createElement('br'))
+
+show(pattern);
+
+//判断赢
+function check(pattern,color){
+  for(let i = 0; i<3;i++){
+    let win = true;
+    for(let j = 0;j<3;j++){
+        if(pattern[i][j] !==color){
+            win=false;
+            break;
+        }
+    }
+    if(win){
+        return true;
+    }
+
+    {
+        let win = true;
+        for(let j = 0;j<3;j++){
+            if(pattern[j][i] !==color){
+                win = false;
+                break;
+            }
+        }
+        if(win){
+            return true;
+        }
+    }
+
+     {
+        let win = true;
+        for(let j = 0;j<3;j++){
+            if(pattern[j][j] !==color){
+                win=false;
+                break;
+            }
+        }
+        if(win){
+            return true;
+        }
+    }
+    {
+        let win = true;
+        for(let j = 0;j<3;j++){
+            if(pattern[j][2-j] !==color){
+                win=false;
+                break;
+            }
+        }
+        if(win){
+            return true;
+        }
+    }
+    return false;
+}
+}
+
+function clone(pattern){
+    return JSON.parse(JSON.stringify(pattern))
+}
+function willWin(pattern,color){
+ for(let i = 0; i < 3; i ++){
+        for(let j = 0;j < 3;j++){
+            if(pattern[i][j] !==0){
+                continue;
+            }
+            let tmp = clone(pattern)
+            tmp[i][j] = color;
+            if(check(tmp,color)){
+                //return true;
+                return [j,i]
+            }
+        }
+        }
+        //return falses;
+        return null
+}
+
+function bestChoice(pattern,color){
+    let point = null;
+    //if里写等号
+    if(point = willWin(pattern,color)){
+        return {
+            point:point,
+            result:1
+        }
+    }
+    //我走了一步之后对方的bestChoice 棋盘 来判断我方的
+    let result = -1;
+     outer:for(let i = 0; i < 3; i ++){
+        for(let j = 0;j < 3;j++){
+            if(pattern[i][j] !==0){
+                continue;
+            }
+            let tmp = clone(pattern)
+            tmp[i][j] = color;
+            //对手的bestChoice
+            let opp = bestChoice(tmp,3-color);
+            //对手的结果
+            if(-opp.result >=result){
+                point = [j,i]; // X,Y的坐标 循环是yj
+                result = -opp.result;
+            }
+            if(result == 1){
+                break outer;
+            }
+        }}
+        return {
+            point:point,
+            result:point ? result : 0
+        }
+}
+
+
+//抽象升级
+function check(pattern,color,x,y){
+// 临时作业
+}
+
+//我方没有willWin的点 对方有大于2个willWin的点
+
+</script>
+
+
+
+
+
