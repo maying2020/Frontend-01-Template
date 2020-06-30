@@ -26,7 +26,6 @@
 <button onclick="localStorage.map = JSON.stringify(map)">save</button>
 <script>
     var map = localStorage.map ? JSON.parse(localStorage.map) : new Array(10000).fill(0);
-    console.log('map',map)
     let container = document.getElementById("container");
     for(let y = 0; y < 100; y++) {
         for(let x = 0; x < 100; x++) {
@@ -64,8 +63,8 @@ function sleep(t){
     })
 }
     async function findPath(map, start, end) {
-        let quene =[start];
-        // 广度优先搜索
+        // 深度优先搜索
+        let stack =[start];
         map = map.slice();
 
         async function insert([x,y]){
@@ -77,12 +76,13 @@ function sleep(t){
             map[y * 100 + x] = 2;
             container.children[y * 100 + x].style.backgroundColor = 'lightgreen';
             await sleep(2);
-            quene.push([x,y])
+            stack.push([x,y])
 
         }
 
-        while(quene.length){
-            let [x,y] = quene.shift();
+        while(stack.length){
+            let [x,y] = stack.pop();
+            console.log(x,y)
             if(x ===  end[0] && y === end[1]) return true;
             await insert([x-1,y])
             await insert([x+1,y])
