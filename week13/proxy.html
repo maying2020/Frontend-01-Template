@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>proxy</title>
+</head>
+
+<body>
+    <script>
+
+        let handlers = new Map();
+
+        let object = {
+            a: 1,
+            b: 2
+        }
+
+        let usedReactivity = [];
+
+
+
+        function reactive(obj) {
+            return new Proxy(obj, {
+                get(obj, prop) {
+                    console.log(obj, prop)
+                    usedReactivity.push([obj,prop])
+                    return obj[prop]
+                },
+                set(obj, prop, val) {
+                    obj[prop] = val;
+                    if(handlers.get(obj).get(prop)){
+                        for(let handler of handlers.get(obj).get(prop)){
+                            handler()
+                        }
+                    }
+                    console.log(handlers)
+                    return obj[prop];
+                }
+            })
+        }
+
+
+        function effect(handler) {
+            usedReactivity=[];
+            handler();
+            for(let user of usedReactivity){
+                let [obj,prop] = user;
+                console.log([obj,prop])
+
+                if(!handlers.has(obj)){
+                    handlers.set(obj,new Map())
+                }
+
+                if(!handlers.get(obj).has(prop)){
+                    handlers.get(obj).set(prop,[])
+
+                }
+                handlers.get(obj).get(prop).push(handler)
+            }
+        }
+
+        let dummy;
+        let proxy = reactive(object)
+
+        effect(() => dummy = proxy.a)
+        console.log('dummy1', dummy)
+        proxy.a = 4;
+        console.log('dummy2', dummy)
+
+
+
+    </script>
+</body>
+
+</html>
